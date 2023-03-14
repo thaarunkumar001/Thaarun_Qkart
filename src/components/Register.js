@@ -8,7 +8,7 @@ import Footer from "./Footer";
 import Header from "./Header";
 import "./Register.css";
 
-const Register = () => {
+function Register() {
   const { enqueueSnackbar } = useSnackbar();
 
 
@@ -35,7 +35,41 @@ const Register = () => {
    *      "message": "Username is already taken"
    * }
    */
+   const [formData,setFormData]=useState({
+    username: "",
+    password:"",
+    confirmPassword:"",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
   const register = async (formData) => {
+    setIsLoading(true);
+    const isValid = validateInput(formData);
+    if (isValid) {
+      try {
+        const data = { username: formData.username, password: formData.password}
+         const response = await axios.post(
+          `${config.endpoint}/auth/register`,
+          data        );
+        console.log(response)
+        if (response.data.success) {
+          enqueueSnackbar("Registered successfully", { variant: "success" });
+        }
+      } 
+      catch (error) {
+        try{
+          enqueueSnackbar(error.response.data.message, { variant: "error" });
+        }catch(err){
+          enqueueSnackbar("Something went wrong. Check that the backend is running, reachable and returns valid JSON", { variant: "error" });
+        }
+      }
+    }
+    setIsLoading(false);
   };
 
   // TODO: CRIO_TASK_MODULE_REGISTER - Implement user input validation logic
@@ -57,6 +91,36 @@ const Register = () => {
    * -    Check that confirmPassword field has the same value as password field - Passwords do not match
    */
   const validateInput = (data) => {
+    if (!data.username) {
+      setIsLoading(false);
+      enqueueSnackbar("Username is a required field", { variant: "warning" });
+      return false;
+    }
+    if (data.username.length < 6) {
+      setIsLoading(false);
+      enqueueSnackbar("Username must be at least 6 characters", {
+        variant: "error",
+      });
+      return false;
+    }
+    if (!data.password) {
+      setIsLoading(false);
+      enqueueSnackbar("Password is a required field", { variant: "warning" });
+      return false;
+    }
+    if (data.password.length < 6) {
+      setIsLoading(false);
+      enqueueSnackbar("Password must be at least 6 characters", {
+        variant: "error",
+      });
+      return false;
+    }
+    if (data.password !== data.confirmPassword) {
+      setIsLoading(false);
+      enqueueSnackbar("Passwords do not match", { variant: "warning" });
+      return false;
+    }
+    return true;
   };
 
   return (
@@ -77,8 +141,8 @@ const Register = () => {
             title="Username"
             name="username"
             placeholder="Enter Username"
-            fullWidth
-          />
+            onChange={handleInputChange}
+            fullWidth />
           <TextField
             id="password"
             variant="outlined"
@@ -87,30 +151,32 @@ const Register = () => {
             type="password"
             helperText="Password must be atleast 6 characters length"
             fullWidth
-            placeholder="Enter a password with minimum 6 characters"
-          />
+            placeholder="Enter a password with minimum 6 characters" 
+            onChange={handleInputChange}/>
           <TextField
             id="confirmPassword"
             variant="outlined"
             label="Confirm Password"
             name="confirmPassword"
             type="password"
-            fullWidth
-          />
-           <Button className="button" variant="contained">
-            Register Now
-           </Button>
+            fullWidth 
+            onChange={handleInputChange}/>
+          {!isLoading?(<Button className="button" variant="contained" onClick={() => register(formData)} disabled={isLoading}>      
+               Register Now      
+                    </Button>) :
+                     (<CircularProgress style={{margin: '0 auto'}}/>)
+            }
           <p className="secondary-action">
             Already have an account?{" "}
-             <a className="link" href="#">
+            <a className="link" href="#">
               Login here
-             </a>
+            </a>
           </p>
         </Stack>
       </Box>
       <Footer />
     </Box>
   );
-};
+}
 
 export default Register;
