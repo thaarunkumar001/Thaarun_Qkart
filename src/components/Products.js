@@ -72,7 +72,6 @@ const debounceSearch = (event, debounceTimeout) => {
     const handleSearch = (event) => {
       const newDebounceTimeout = debounceSearch(event, debounceTimeout);
       setDebounceTimeout(newDebounceTimeout);
-      console.log(newDebounceTimeout)
     };
   
   return (
