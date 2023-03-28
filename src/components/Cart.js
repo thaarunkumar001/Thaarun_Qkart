@@ -83,7 +83,27 @@ export const getTotalItems = (items = []) =>
   return count; }); 
   return itemsCount.reduce((acc, curr) => { return acc + curr; }, 0); 
 };
-
+let OrderDetailsView = ({ items = [] }) => { return (<><Box className="cart">
+  <Box display="flex" flexDirection="column" padding="1rem">
+    <h2>Order Details</h2> 
+    <Box display="flex" flexDirection="row" justifyContent="space-between" 
+//alignItems="flex-start" 
+> 
+<Box> 
+  <p>Products</p>
+   <p>Subtotal</p> 
+   <p>Shipping Charges</p> 
+   <h3>Total</h3> 
+   </Box> 
+   <Box style={{ textAlign: "right" }}> 
+   <p>{getTotalItems(items)}</p> 
+   <p>${getTotalCartValue(items)}</p> 
+   <p>$0</p> <h3>${getTotalCartValue(items)}</h3> 
+   </Box> 
+   </Box> 
+   </Box> 
+   </Box> 
+   </> ); };
 /**
  * Component to display the current quantity for a product and + and - buttons to update product quantity on cart
  * 
@@ -96,13 +116,14 @@ export const getTotalItems = (items = []) =>
  * @param {Function} handleDelete
  *    Handler function which reduces the quantity of a product in cart by 1
  * 
+ * @param {Boolean} isReadOnly
+ *    If product quantity on cart is to be displayed as read only without the + - options to change quantity
  * 
  */
 const ItemQuantity = ({
   value,
   handleAdd,
   handleDelete,
-  is
 }) => {
   return (
     <Stack direction="row" alignItems="center">
@@ -131,6 +152,8 @@ const ItemQuantity = ({
  * @param {Function} handleDelete
  *    Current quantity of product in cart
  * 
+ * @param {Boolean} isReadOnly
+ *    If product quantity on cart is to be displayed as read only without the + - options to change quantity
  * 
  */
 const Cart = ({
@@ -163,7 +186,7 @@ const Cart = ({
             // Add product image
             src={item.image}
             // Add product name as alt eext
-            alt={item.image}
+            alt={item.name}
             width="100%"
             height="100%"
         />
@@ -181,18 +204,16 @@ const Cart = ({
             justifyContent="space-between"
             alignItems="center"
         >
-        <ItemQuantity
+        {isReadOnly ? (<Box style={{ fontSize: "1rem" }}>Qty: {item.qty}</Box> ) : 
+        (<ItemQuantity // Add required props by checking implementation 
         value={item.qty} 
-        handleAdd={() => handleQuantity(item._id, item.qty + 1) } 
-        handleDelete={() => handleQuantity(item._id, item.qty - 1) }
-        />
-        <Box padding="0.5rem" fontWeight="700">
-            ${item.cost}
+        handleAdd={() => handleQuantity(item.productId, item.qty + 1) } 
+        handleDelete={() => handleQuantity(item.productId, item.qty - 1) } /> )}
+        <Box padding="0.5rem" fontWeight="700"> ${item.cost}
         </Box>
         </Box>
-    </Box>
-</Box>
-        ))}
+        </Box>
+        </Box> ))}
         <Box
           padding="1rem"
           display="flex"
@@ -213,7 +234,7 @@ const Cart = ({
           </Box>
         </Box>
 
-        <Box display="flex" justifyContent="flex-end" className="cart-footer">
+        {isReadOnly?null:(<Box display="flex" justifyContent="flex-end" className="cart-footer">
           <Button
             color="primary"
             variant="contained"
@@ -225,9 +246,9 @@ const Cart = ({
             }>
             Checkout
           </Button>
-        </Box>
+        </Box>)}
       </Box>
-    </>
+      {isReadOnly ? <OrderDetailsView items={items} /> : null}</>
   );
 };
 
