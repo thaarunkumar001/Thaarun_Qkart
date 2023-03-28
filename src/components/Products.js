@@ -113,7 +113,7 @@ const debounceSearch = (event, debounceTimeout) => {
     const isItemInCart = (items, productId) => {
       let isItem=false;
       items.forEach((item)=>{
-        if(item._id==productId) 
+        if(item._id===productId) 
         isItem=true;
       });
       return isItem;

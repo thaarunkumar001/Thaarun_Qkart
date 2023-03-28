@@ -207,8 +207,8 @@ const Cart = ({
         {isReadOnly ? (<Box style={{ fontSize: "1rem" }}>Qty: {item.qty}</Box> ) : 
         (<ItemQuantity // Add required props by checking implementation 
         value={item.qty} 
-        handleAdd={() => handleQuantity(item.productId, item.qty + 1) } 
-        handleDelete={() => handleQuantity(item.productId, item.qty - 1) } /> )}
+        handleAdd={() => handleQuantity(item._id, item.qty + 1) } 
+        handleDelete={() => handleQuantity(item._id, item.qty - 1) } /> )}
         <Box padding="0.5rem" fontWeight="700"> ${item.cost}
         </Box>
         </Box>
